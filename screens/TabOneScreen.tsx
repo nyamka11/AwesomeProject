@@ -1,56 +1,47 @@
     import * as React from 'react';
-    import { StyleSheet, TextInput, Button } from 'react-native';
+    import { StyleSheet, TextInput, Button, ScrollView, SafeAreaView } from 'react-native';
 
-    import EditScreenInfo from '../components/EditScreenInfo';
+
     import { Text, View } from '../components/Themed';
     import DropDownPicker from 'react-native-dropdown-picker';
 
-
     let data =[
         {
-            name: "Shose",
+            name: "Shoseee",
             input1: "Count",
             input2: "Start date",
-            input2: "End date",
-            input3: "Description"
+            input3: "End date",
+            input4: "Description"
         },
         {
             name: "Rise",
             input1: "Count",
             input2: "Start date",
-            input2: "End date",
-            input3: "Description"
         },
         {
             name: "Juice",
             input1: "Count",
-            input2: "Start date",
-            input2: "End date",
-            input3: "Description"
+            input3: "End date",
+            input4: "Description"
         },
         {
             name: "Wather",
             input1: "Count",
+            input4: "Description"
+        },
+        {
+            name: "Cup",
+            input1: "Count",
             input2: "Start date",
-            input2: "End date",
-            input3: "Description"
+            input3: "End date",
+            input4: "Description"
         },
     ];
-
-    function RegisterComponent(props) {
-        return (
-            <TextInput
-                style={ styles.textInput }
-                placeholder = { props.name }
-            />
-        );
-    }
 
     class DropDownComponent extends React.Component  {
         constructor(props)  {
             super(props);
         }
-
 
         render()  {
             let items = [];
@@ -80,59 +71,96 @@
         constructor(props)  {
             super(props);
             this.state = {
-                items: []
+                items: ""
             };
+            this.onChange = this.onChange.bind(this);
+            this.btnIshide = true;
         }
 
         onChange(selectedItem)  {
-            let selectedRow = [];
             data.map((row) => 　{
                 if(selectedItem.label == row.name)  {
-                    selectedRow.push(row);
+                    this.setState({ items: row });
                 }
             });
+        }
 
-            this.setState({
-                items: selectedRow
-            });
+        componentDidUpdate()  {
 
-            // console.log(selectedRow);
         }
 
         render()  {
+            const items = [];
+            Object.entries(this.state.items).map(([key,value],i) =>  {
+                items.push(<TextInput
+                    style={ styles.textInput }
+                    placeholder={ value }
+                    placeholderTextColor="#cacaca"
+                />);
+            });
+
             return (
-                <View style={ styles.container }>
-                    <DropDownComponent onChange = { this.onChange }/>
-                    <RegisterComponent />
-                </View>
+                // <SafeAreaView style={styles.container}>
+                //     <ScrollView style={ styles.scrollView }>
+                    <View style={ styles.container }>
+                        <DropDownComponent onChange = { this.onChange } />
+                        {items}
+                        <Button
+                            style = { styles.button  }
+                            title="Register"
+                            onPress={() => { alert("OK")  }}
+                        />
+                    </View>
+                    // </ScrollView>
+                // </SafeAreaView>
             );
         }
     }
 
     const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-        alignItems: 'center',
-        // justifyContent: 'center',
-        paddingTop: 20
-      },
-      textInput: {
-        width: "90%",
-        height: 40,
-        borderRadius: 5,
-        paddingLeft: 15,
-        paddingRight: 15,
-        marginVertical: 10,
-        borderColor: "gray",
-        borderWidth: 1
-      },
-      title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-      },
-      separator: {
-        marginVertical: 30,
-        height: 1,
-        width: '80%',
-      },
+        container: {
+            flex: 1,
+            alignItems: 'center',
+            // justifyContent: 'center',
+            paddingTop: 20,
+            backgroundColor: "white"
+        },
+        textInput: {
+            paddingLeft:15,
+            paddingRight:15,
+            height: 40,
+            width: "90%",
+            borderRadius: 5,
+            marginVertical: 5,
+            borderColor: 'gray',
+            borderWidth: 1
+        },
+        button: {
+            backgroundColor:"blue",
+            marginTop: 18,
+            display: 'none'
+        },
+        scrollView: {
+            backgroundColor: 'pink',
+            height: "100%"
+        },
+        textInput: {
+            width: "90%",
+            height: 40,
+            borderRadius: 5,
+            paddingLeft: 15,
+            paddingRight: 15,
+            marginTop: 8,
+            borderColor: "gray",
+            borderWidth: 1
+        },
+        title: {
+            fontSize: 20,
+            fontWeight: 'bold',
+        },
+        separator: {
+            marginVertical: 30,
+            height: 1,
+            width: '80%',
+        },
     });
