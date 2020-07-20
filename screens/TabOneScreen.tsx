@@ -1,120 +1,91 @@
-    import * as React from 'react';
-    import { StyleSheet, TextInput, Button, ScrollView, SafeAreaView } from 'react-native';
+
+    import  React, { useState, useEffect } from 'react';
+    import { ActivityIndicator, StyleSheet, TextInput, Button, ScrollView, SafeAreaView } from 'react-native';
 
 
     import { Text, View } from '../components/Themed';
     import DropDownPicker from 'react-native-dropdown-picker';
 
-    let data =[
-        {
-            name: "Shoseee",
-            input1: "Count",
-            input2: "Start date",
-            input3: "End date",
-            input4: "Description"
-        },
-        {
-            name: "Rise",
-            input1: "Count",
-            input2: "Start date",
-        },
-        {
-            name: "Juice",
-            input1: "Count",
-            input3: "End date",
-            input4: "Description"
-        },
-        {
-            name: "Wather",
-            input1: "Count",
-            input4: "Description"
-        },
-        {
-            name: "Cup",
-            input1: "Count",
-            input2: "Start date",
-            input3: "End date",
-            input4: "Description"
-        },
-    ];
 
-    class DropDownComponent extends React.Component  {
-        constructor(props)  {
-            super(props);
+    function TabOneScreen()  {
+        const [error, setError] = useState(null);
+        const [isLoaded, setIsLoaded] = useState(false);
+        const [catalogs, setCatalogs] = useState([]);
+        const [fields, setFields] = useState([]);
+
+        useEffect(()=>  {
+            getAPI("http://ec2-107-23-240-208.compute-1.amazonaws.com/api/catalog.php", function(result)  {
+                setCatalogs(result);
+            });
+        });
+
+        function getAPI(URL, onSuccess)  {
+            fetch(URL)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    onSuccess(result);
+                    // console.log(result)
+                },
+                (error) => {
+                    setIsLoaded(true);
+                    setError(error);
+                }
+            );
         }
 
-        render()  {
-            let items = [];
-            data.map((row) => {
-                items.push({label: row.name, value: row.name })
-            })
+        const onChange=(item) =>  {
+            setIsLoaded(true);
+            getAPI("http://ec2-107-23-240-208.compute-1.amazonaws.com/api/fields.php?catalogid="+item.value, function(result)  {
+                setIsLoaded(false);
+                setFields(result);
+            });
+        }
 
-            return(
+        function FieldDraw()  {
+            if(fields.length > 0)  {
+                return fields.map((item)=> {
+                    return <TextInput
+                        style={ styles.textInput }
+                        placeholder={ item.name }
+                        placeholderTextColor="#cacaca"
+                    />
+                });
+            }
+            else {
+                return <Text style={styles.text}>Fields not found!</Text>
+            }
+        }
+
+        return (
+            <View style={styles.container}>
                 <DropDownPicker
                     style={{ width:"90%", display: "flex" }}
-                    items={ items }
+                    items={
+                        catalogs.map((row) => {
+                            return { label: row.name, value: row.id }
+                        })
+                    }
                     defaultIndex={ 5 }
                     containerStyle={{display: "flex"}}
                     activeItemStyle={{ alignItems: 'center' }}
-                    activeLabelStyle={{ color: 'red' }}
+                    activeLabelStyle={{ color: 'green' }}
                     containerStyle={{ height: 40 }}
                     dropDownMaxHeight = { 400 }
                     dropDownStyle = {{ width:"90%" }}
-                    itemStyle={{ backgroundColor: "green",  float:"left", alignItems: 'flex-start' }}
-                    onChangeItem={ (selectedItem) =>{ this.props.onChange(selectedItem) }}
+                    itemStyle={{ float:"left", alignItems: 'flex-start' }}
+                    onChangeItem={(selectedItem) =>{ onChange(selectedItem) }}
                 />
-            )
-        }
-    }
+                { !isLoaded && <FieldDraw /> }
+                <ActivityIndicator
+                    style={{ height: 80 }}
+                    color="green"
+                    size="large"
+                    animating ={ isLoaded }
+                />
 
-    export default class TabOneScreen extends React.Component {
-        constructor(props)  {
-            super(props);
-            this.state = {
-                items: ""
-            };
-            this.onChange = this.onChange.bind(this);
-            this.btnIshide = true;
-        }
-
-        onChange(selectedItem)  {
-            data.map((row) => 　{
-                if(selectedItem.label == row.name)  {
-                    this.setState({ items: row });
-                }
-            });
-        }
-
-        componentDidUpdate()  {
-
-        }
-
-        render()  {
-            const items = [];
-            Object.entries(this.state.items).map(([key,value],i) =>  {
-                items.push(<TextInput
-                    style={ styles.textInput }
-                    placeholder={ value }
-                    placeholderTextColor="#cacaca"
-                />);
-            });
-
-            return (
-                // <SafeAreaView style={styles.container}>
-                //     <ScrollView style={ styles.scrollView }>
-                    <View style={ styles.container }>
-                        <DropDownComponent onChange = { this.onChange } />
-                        {items}
-                        <Button
-                            style = { styles.button  }
-                            title="Register"
-                            onPress={() => { alert("OK")  }}
-                        />
-                    </View>
-                    // </ScrollView>
-                // </SafeAreaView>
-            );
-        }
+            </View>
+        );
     }
 
     const styles = StyleSheet.create({
@@ -129,11 +100,16 @@
             paddingLeft:15,
             paddingRight:15,
             height: 40,
-            width: "90%",
+            width: "100%",
             borderRadius: 5,
             marginVertical: 5,
             borderColor: 'gray',
             borderWidth: 1
+        },
+        text: {
+            marginTop:10,
+            fontSize: 20,
+            color: "black"
         },
         button: {
             backgroundColor:"blue",
@@ -164,3 +140,5 @@
             width: '80%',
         },
     });
+
+    export default TabOneScreen
