@@ -8,8 +8,8 @@
 
     let data =[
         {
-            name: "Shose",
-            input1: "Count",
+            name: "Shossss eee",
+            input1: "Couss nt",
             input2: "Start date",
             input2: "End date",
             input3: "Description"
