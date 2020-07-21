@@ -3,6 +3,7 @@
     import { ActivityIndicator, StyleSheet, TextInput, Button, ScrollView, SafeAreaView } from 'react-native';
     import { Text, View } from '../components/Themed';
     import DropDownPicker from 'react-native-dropdown-picker';
+    // import DatePicker from 'react-native-datepicker';
 
     function TabOneScreen()  {
         let basicURL = "http://ec2-107-23-240-208.compute-1.amazonaws.com/api/";
@@ -10,13 +11,15 @@
         const [isLoaded, setIsLoaded] = useState(false);
         const [catalogs, setCatalogs] = useState([]);
         const [fields, setFields] = useState([]);
+        const [date, setDate] = useState("2016-05-15");
 
         useEffect(() =>  {
-            getAPI("catalog.php",
-            (result) => {
+            getAPI("catalog.php",(result) => {
                 setCatalogs(result);
+                console.log("yeee");
             });
-        });
+
+        },[]);
 
         const getAPI = (URL, onSuccess) =>  {
             fetch(basicURL + URL)
@@ -24,7 +27,6 @@
             .then(
                 (result) => {
                     onSuccess(result);
-                    // console.log(result)
                 },
                 (error) => {
                     setIsLoaded(true);
@@ -42,10 +44,11 @@
             });
         }
 
-        function FieldDraw()  {
+        const FieldDraw = () =>  {
             if(fields.length > 0)  {
                 return fields.map((item)=> {
                     return <TextInput
+                        key = { item.id }
                         style={ styles.textInput }
                         placeholder={ item.name }
                         placeholderTextColor="#cacaca"
@@ -60,7 +63,7 @@
         return (
             <View style={styles.container}>
                 <DropDownPicker
-                    style={{ width:"90%", display: "flex" }}
+                    style={{ width:"90%", display: "flex", borderColor: "gray" }}
                     items={
                         catalogs.map((row) => {
                             return { label: row.name, value: row.id }
@@ -74,6 +77,7 @@
                     dropDownMaxHeight = { 400 }
                     dropDownStyle = {{ width:"90%" }}
                     itemStyle={{ float:"left", alignItems: 'flex-start' }}
+                    labelStyle={{fontSize: 18, color: '#000'}}
                     onChangeItem={(selectedItem) =>{ onChange(selectedItem) }}
                 />
                 { !isLoaded && <FieldDraw /> }
@@ -94,16 +98,6 @@
             // justifyContent: 'center',
             paddingTop: 20,
             backgroundColor: "white"
-        },
-        textInput: {
-            paddingLeft:15,
-            paddingRight:15,
-            height: 40,
-            width: "100%",
-            borderRadius: 5,
-            marginVertical: 5,
-            borderColor: 'gray',
-            borderWidth: 1
         },
         text: {
             marginTop:10,
@@ -126,8 +120,9 @@
             paddingLeft: 15,
             paddingRight: 15,
             marginTop: 8,
-            borderColor: "gray",
-            borderWidth: 1
+            borderColor: "#cacaca",
+            borderWidth: 1,
+            color: "black"
         },
         title: {
             fontSize: 20,
