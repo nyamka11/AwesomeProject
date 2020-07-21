@@ -3,7 +3,7 @@
     import { ActivityIndicator, StyleSheet, TextInput, Button, ScrollView, SafeAreaView } from 'react-native';
     import { Text, View } from '../components/Themed';
     import DropDownPicker from 'react-native-dropdown-picker';
-    // import DatePicker from 'react-native-datepicker';
+    import { DatePicker } from '../components/DatePicker';
 
     function TabOneScreen()  {
         let basicURL = "http://ec2-107-23-240-208.compute-1.amazonaws.com/api/";
@@ -11,14 +11,12 @@
         const [isLoaded, setIsLoaded] = useState(false);
         const [catalogs, setCatalogs] = useState([]);
         const [fields, setFields] = useState([]);
-        const [date, setDate] = useState("2016-05-15");
+        const [date, setDate] = useState(new Date())
 
         useEffect(() =>  {
-            getAPI("catalog.php",(result) => {
+            getAPI("catalog.php",(result) =>  {
                 setCatalogs(result);
-                console.log("yeee");
             });
-
         },[]);
 
         const getAPI = (URL, onSuccess) =>  {
@@ -87,6 +85,7 @@
                     size="large"
                     animating ={ isLoaded }
                 />
+                <DatePicker/ >
             </View>
         );
     }
