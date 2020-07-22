@@ -78,14 +78,19 @@
                     labelStyle={{fontSize: 18, color: '#000'}}
                     onChangeItem={(selectedItem) =>{ onChange(selectedItem) }}
                 />
-                { !isLoaded && <FieldDraw /> }
+                { !isLoaded &&
+                    <View style={{ width: "100%",flex: 1, alignItems: 'center',backgroundColor: "white" }}>
+                        <FieldDraw />
+                        <DatePicker Text=" Start date" />
+                        <DatePicker Text=" End date" />
+                    </View>
+                }
                 <ActivityIndicator
                     style={{ height: 80 }}
                     color="green"
                     size="large"
                     animating ={ isLoaded }
                 />
-                <DatePicker/ >
             </View>
         );
     }

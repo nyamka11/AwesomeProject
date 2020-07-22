@@ -5,11 +5,11 @@ import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 
-export const DatePicker = () => {
+export const DatePicker = (props) => {
     const [date, setDate] = useState(new Date(1598051730000));
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
-    const [value, setValue] = useState(" End date");
+    const [value, setValue] = useState(props.Text);
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
@@ -35,6 +35,7 @@ export const DatePicker = () => {
 
     const onCancel = () => {
         setShow(false);
+        setValue(props.Text);
     };
 
     const onConfirm = () => {
@@ -59,7 +60,7 @@ export const DatePicker = () => {
                 />
             </View>
             {show && (
-                <View>
+                <View style ={{ position: "relative", borderWidth:1, width:"100%", zIndex: 1000, backgroundColor: "white" }}>
                     <View style={{flexDirection: 'row'}}>
                         <View >
                             <Button
@@ -79,7 +80,6 @@ export const DatePicker = () => {
                         </View>
                     </View>
                     <DateTimePicker
-                        style ={{ }}
                         testID="dateTimePicker"
                         value={date}
                         mode={mode}
