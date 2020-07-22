@@ -16,7 +16,6 @@ export const DatePicker = () => {
     const showMode = currentMode => {
         setShow(true);
         setMode(currentMode);
-        alert("asdf");
     };
 
     const showDatepicker = () => {
@@ -27,13 +26,12 @@ export const DatePicker = () => {
         showMode('time');
     };
 
+    // <Button onPress={showTimepicker} title="Show time picker!" />
     return (
         <View style={{ width: "90%", backgroundColor: "green"}}>
             <View>
-                <TextInput style={styles.textInput} onClick={showDatepicker} />
-            </View>
-            <View>
-                <Button onPress={showTimepicker} title="Show time picker!" />
+                <TextInput style={styles.textInput} onFocus={showDatepicker} />
+                <div>asdasdf</div>
             </View>
             {show && (
                 <DateTimePicker
