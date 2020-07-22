@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
-import { View, Button, Platform, TextInput, StyleSheet } from 'react-native';
+import { View,  Platform, TextInput, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Button } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 export const DatePicker = () => {
     const [date, setDate] = useState(new Date(1598051730000));
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
+    const [value, setValue] = useState(" End date");
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
         setShow(Platform.OS === 'ios');
         setDate(currentDate);
+
+        let d = new Date(currentDate);
+        setValue(" "+d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear());
     };
 
     const showMode = currentMode => {
@@ -26,24 +33,62 @@ export const DatePicker = () => {
         showMode('time');
     };
 
+    const onCancel = () => {
+        setShow(false);
+    };
+
+    const onConfirm = () => {
+        setShow(false);
+    };
+
     // <Button onPress={showTimepicker} title="Show time picker!" />
     return (
-        <View style={{ width: "90%", backgroundColor: "green"}}>
+        <View style={{ width: "90%"}}>
             <View>
-                <TextInput style={styles.textInput} onFocus={showDatepicker} />
-                <div>asdasdf</div>
+                <Button
+                    icon={
+                        <Icon
+                          name="calendar"
+                          size={15}
+                          color="black"
+                        />
+                    }
+                    title={value}
+                    type="outline"
+                    onPress={ showDatepicker }
+                />
             </View>
             {show && (
-                <DateTimePicker
-                    style ={{ }}
-                    testID="dateTimePicker"
-                    value={date}
-                    mode={mode}
-                    is24Hour={true}
-                    display="default"
-                    onChange={onChange}
-                    textColor="black"
-                />
+                <View>
+                    <View style={{flexDirection: 'row'}}>
+                        <View >
+                            <Button
+                                title="Cancel"
+                                style={{ width:100, height:35 }}
+                                type="clear"
+                                onPress={ onCancel }
+                            />
+                        </View>
+                        <View style={{marginLeft: 'auto'}} >
+                            <Button
+                                title="Confirm"
+                                style={{ width:100, height:50, height:35 }}
+                                type="clear"
+                                onPress={ onConfirm }
+                            />
+                        </View>
+                    </View>
+                    <DateTimePicker
+                        style ={{ }}
+                        testID="dateTimePicker"
+                        value={date}
+                        mode={mode}
+                        is24Hour={true}
+                        display="default"
+                        onChange={onChange}
+                        textColor="black"
+                    />
+                </View>
             )}
         </View>
     );

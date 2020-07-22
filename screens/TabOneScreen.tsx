@@ -1,6 +1,6 @@
 
     import  React, { useState, useEffect } from 'react';
-    import { ActivityIndicator, StyleSheet, TextInput, Button, ScrollView, SafeAreaView } from 'react-native';
+    import { ActivityIndicator, StyleSheet, TextInput, ScrollView, SafeAreaView } from 'react-native';
     import { Text, View } from '../components/Themed';
     import DropDownPicker from 'react-native-dropdown-picker';
     import { DatePicker } from '../components/DatePicker';
