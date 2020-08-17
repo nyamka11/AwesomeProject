@@ -86,8 +86,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     borderColor: "#cacaca",
     borderWidth: 1,
-    color: "black",
-    float: "left"
+    color: "black"
   },
   view1:{
     paddingLeft:15, 
