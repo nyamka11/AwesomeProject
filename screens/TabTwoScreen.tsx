@@ -56,7 +56,7 @@ export default function App() {
     }
     else {
       foundQR1.count = (parseInt(count) + parseInt(value));
-      // setCount(foundQR1.count);
+      setCount(foundQR1.count);
     }
     setValue("");
   }
