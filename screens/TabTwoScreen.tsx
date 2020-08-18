@@ -43,11 +43,12 @@ export default function App() {
   }
 
   const countHandler = (event) => {
-    setValue(event.nativeEvent.text);
+      setValue(event.nativeEvent.text);
   };
 
-  const okBtn = ()=>{
-    setCount(parseInt(count) + parseInt(value));
+  const okBtn = ()=> {
+    console.log(value);
+    setCount(parseInt(count) + parseInt(value || 0));
     const foundQR1 = scannedQRList.find((obj)=> obj.code === qrData);
     if(foundQR1 == null)  { //Amgiin ahnii vyd shineer unshigdah 
       setScannedQRList(scannedQRList.concat({'code': qrData, 'count': 1}));
@@ -55,10 +56,9 @@ export default function App() {
     }
     else {
       foundQR1.count = (parseInt(count) + parseInt(value));
-      setCount(foundQR1.count);
+      // setCount(foundQR1.count);
     }
-
-    if(value !="") setValue("");
+    setValue("");
   }
 
   if(scanned) return (      
@@ -66,7 +66,7 @@ export default function App() {
       <View style={styles.inner}>
         <Text>Data: {qrData}</Text>
         <Text>Count: {count}</Text>
-        <TextInput style={styles.textInput} value={ value } onChange={countHandler} placeholder="count"/> 
+        <TextInput style={styles.textInput} value={ value } onChange={countHandler} placeholder="Quantity"/> 
         <Button title={'OK'} onPress={() => okBtn()} />
         <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />
       </View>
