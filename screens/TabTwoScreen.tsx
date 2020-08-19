@@ -1,172 +1,154 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button, TextInput, ScrollView } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import {BootstrapStyleSheet } from 'react-native-bootstrap-styles';
+import React, { Component } from "react";
+import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
+import { QRreader } from '../components/QR-reader';
 
-export default function App() {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
+import {
+  NativeRouter,
+  Route,
+  Link,
+  Redirect,
+  withRouter
+} from "react-router-native";
 
-  const [qrData, setQRData] = useState("");
-  const [count, setCount] = useState(0);
-  const [value, setValue] = useState("");
-  const [scannedQRList, setScannedQRList] = useState([]);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
-  
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    setQRData(data);
-
-    const foundQR = scannedQRList.find((obj)=> obj.code === data);
-    if(foundQR == null)  { //Amgiin ahnii vyd shineer unshigdah 
-      setScannedQRList(scannedQRList.concat({'code': data, 'count': 1}));
-      setCount(1);
-    }
-    else {
-      foundQR.count += 1;
-      setCount(foundQR.count);
-    }
-  };
-
-  if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
-  }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
-
-  const countHandler = (event) => {
-      setValue(event.nativeEvent.text);
-  };
-
-  const okBtn = ()=> {
-    console.log(value);
-    setCount(parseInt(count) + parseInt(value || 0));
-    const foundQR1 = scannedQRList.find((obj)=> obj.code === qrData);
-    if(foundQR1 == null)  { //Amgiin ahnii vyd shineer unshigdah 
-      setScannedQRList(scannedQRList.concat({'code': qrData, 'count': 1}));
-      setCount(1);
-    }
-    else {
-      foundQR1.count = (parseInt(count) + parseInt(value));
-      setCount(foundQR1.count);
-    }
-    setValue("");
-  }
-
-  if(scanned) return (      
-    <View style={styles.box}>
-      <View style={styles.inner}>
-        <Text>Data: {qrData}</Text>
-        <Text>Count: {count}</Text>
-        <TextInput style={styles.textInput} value={ value } onChange={countHandler} placeholder="Quantity"/> 
-        <Button title={'OK'} onPress={() => okBtn()} />
-        <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />
-      </View>
-    </View>
-  );
-
+function AuthExample() {
   return (
-    <View style={styles.container}>      
-      <View style={styles.camerBox}>
-        <View style={styles.inner}>
-          <BarCodeScanner 
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-            style={StyleSheet.absoluteFillObject}
-          />
+    <NativeRouter>
+      <View style={styles.container}>
+        <AuthButton />
+        <View style={styles.nav}>
+          <Link to="/public" style={styles.navItem} underlayColor="#f0f4f7">
+            <Text>Public Page</Text>
+          </Link>
+          <Link to="/protected" style={styles.navItem} underlayColor="#f0f4f7">
+            <Text>Protected Page</Text>
+          </Link>
         </View>
-      </View> 
-    </View>
+
+        <Route path="/public" component={Public} />
+        <Route path="/login" component={Login} />
+        <PrivateRoute path="/protected" component={Protected} />
+      </View>
+    </NativeRouter>
   );
+}
+
+const fakeAuth = {
+  isAuthenticated: false,
+  authenticate(cb) {
+    this.isAuthenticated = true;
+    setTimeout(cb, 100); // fake async
+  },
+  signout(cb) {
+    this.isAuthenticated = false;
+    setTimeout(cb, 100);
+  }
+};
+
+const AuthButton = withRouter(({ history }) =>
+  fakeAuth.isAuthenticated ? (
+    <View>
+      <Text>Welcome!</Text>
+      <TouchableHighlight
+        style={styles.btn}
+        underlayColor="#f0f4f7"
+        onPress={() => {
+          fakeAuth.signout(() => history.push("/"));
+        }}
+      >
+        <Text>Sign out</Text>
+      </TouchableHighlight>
+    </View>
+  ) : (
+    <Text>You are not logged in.</Text>
+  )
+);
+
+function PrivateRoute({ component: Component, ...rest }) {
+  return (
+    <Route
+      {...rest}
+      render={props =>
+        fakeAuth.isAuthenticated ? (
+          <Component {...props} />
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: props.location }
+            }}
+          />
+        )
+      }
+    />
+  );
+}
+
+function Public() {
+  return <Text style={styles.header}>Public</Text>;
+}
+
+function Protected() {
+  return <Text style={styles.header}>Protected</Text>;
+}
+
+class Login extends Component {
+  state = { redirectToReferrer: false };
+
+  login = () => {
+    fakeAuth.authenticate(() => {
+      this.setState({ redirectToReferrer: true });
+    });
+  };
+
+  render() {
+    const { from } = this.props.location.state || { from: { pathname: "/" } };
+    const { redirectToReferrer } = this.state;
+
+    if (redirectToReferrer) {
+      return <Redirect to={from} />;
+    }
+
+    return (
+      <View>
+        <Text>You must log in to view the page at {from.pathname}</Text>
+
+        <TouchableHighlight
+          style={styles.btn}
+          underlayColor="#f0f4f7"
+          onPress={this.login}
+        >
+          <Text>Log in</Text>
+        </TouchableHighlight>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
-    width:"100%",
-    height: "100%",
-    padding: 5,
+    marginTop: 25,
+    padding: 10
+  },
+  header: {
+    fontSize: 20
+  },
+  nav: {
     flexDirection: "row",
-    flexWrap: "wrap"
+    justifyContent: "space-around"
   },
-  scrollView: {
-    height:"100%",
-    backgroundColor: 'pink'
-  },
-  camerBox: {
-    width: "100%",
-    height: "100%",
-    padding: 5
-  },
-  box:  {
-    width: "100%",
-    height: "100%",
-    padding: 5
-  }, 
-  inner: {
+  navItem: {
     flex: 1,
-    backgroundColor: "#cacaca",
     alignItems: "center",
-    justifyContent: "center"
+    padding: 10
   },
-  textInput: {
-    width: "80%",
-    height: 40,
-    borderRadius: 5,
-    paddingLeft: 15,
-    paddingRight: 15,
-    marginTop: 8,
-    borderColor: "black",
-    borderWidth: 1,
-    color: "black"
+  btn: {
+    width: 200,
+    backgroundColor: "#E94949",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    marginTop: 10
   }
 });
 
-
-// const styles = StyleSheet.create({
-//   textLabel: {
-//     fontWeight: 'bold'
-//   },
-//   textInput: {
-//     width: "80%",
-//     height: 40,
-//     borderRadius: 5,
-//     paddingLeft: 15,
-//     paddingRight: 15,
-//     marginTop: 8,
-//     borderColor: "#cacaca",
-//     borderWidth: 1,
-//     color: "black"
-//   },
-//   view1:{
-//     paddingLeft:15, 
-//     paddingTop:15,
-//     paddingRight:15
-//   },
-//   view2: {
-//     padding:15,
-//   },
-//   view3: {
-//     height:41,
-//     borderWidth:1,
-//     borderColor:"red"
-//   },
-//   button: {
-//     alignItems: "center",
-//     backgroundColor: "#DDDDDD",
-//     padding: 10
-//   },
-//   countContainer: {
-//     alignItems: "center",
-//     padding: 10
-//   },
-//   countText: {
-//     color: "#FF00FF"
-//   }
-// });
+export default AuthExample;

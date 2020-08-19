@@ -42,7 +42,6 @@ export const DatePicker = (props) => {
         setShow(false);
     };
 
-    // <Button onPress={showTimepicker} title="Show time picker!" />
     return (
         <View style={{ width: "90%"}}>
             <View>

@@ -4,6 +4,8 @@
     import { Text, View } from '../components/Themed';
     import DropDownPicker from 'react-native-dropdown-picker';
     import { DatePicker } from '../components/DatePicker';
+    import { QRreader } from '../components/QR-reader';
+    import { NativeRouter, Route, Link, Redirect, withRouter } from "react-router-native";
 
     function TabOneScreen()  {
         let basicURL = "http://ec2-107-23-240-208.compute-1.amazonaws.com/api/";
@@ -12,6 +14,7 @@
         const [catalogs, setCatalogs] = useState([]);
         const [fields, setFields] = useState([]);
         const [date, setDate] = useState(new Date())
+        const [isQRReader, setIsQRReader] = useState(false)
 
         useEffect(() =>  {
             getAPI("catalog.php",(result) =>  {
@@ -58,7 +61,10 @@
             }
         }
 
+        if(isQRReader) return <QRreader/>
+
         return (
+            <NativeRouter>
             <View style={styles.container}>
                 <DropDownPicker
                     style={{ width:"90%", display: "flex", borderColor: "gray" }}
@@ -85,6 +91,25 @@
                         <DatePicker Text=" End date" />
                     </View>
                 }
+
+                <View style={{borderWidth:1, width:"90%", height:50, flexDirection: "row", flexWrap: "wrap", borderRadius:5  }}>
+                    <View 
+                        style={{flex: 1, alignItems: "center", justifyContent: "center", width:"100%", height:"100%", backgroundColor:"green"}}
+                        onStartShouldSetResponder={() => setIsQRReader(true) }
+                    >
+                        <Text style={{color:"white"}}>QR code</Text>
+                    </View>
+                </View>
+
+                <View style={{borderWidth:1, width:"90%", height:50, flexDirection: "row", flexWrap: "wrap", borderRadius:5 , marginTop:5 }}>
+                    <View 
+                        style={{flex: 1, alignItems: "center", justifyContent: "center", width:"100%", height:"100%", backgroundColor:"green"  }}
+                        onStartShouldSetResponder={() => alert("Coming soon...") }
+                    >
+                        <Text style={{color:"white"}}>GPS</Text>
+                    </View>
+                </View>
+
                 <ActivityIndicator
                     style={{ height: 80 }}
                     color="green"
@@ -92,6 +117,7 @@
                     animating ={ isLoaded }
                 />
             </View>
+            </NativeRouter>
         );
     }
 
