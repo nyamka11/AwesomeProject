@@ -62,7 +62,6 @@
         }
 
         if(isQRReader) return <QRreader/>
-
         return (
             <NativeRouter>
             <View style={styles.container}>
