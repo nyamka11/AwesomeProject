@@ -5,7 +5,16 @@
     import DropDownPicker from 'react-native-dropdown-picker';
     import { DatePicker } from '../components/DatePicker';
     import { QRreader } from '../components/QR-reader';
+    import { MapGps } from '../components/Map_gps';
     import { NativeRouter, Route, Link, Redirect, withRouter } from "react-router-native";
+    import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+
+    const initialState = {
+        latitude: null,
+        longitude: null,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421
+    }
 
     function TabOneScreen()  {
         let basicURL = "http://ec2-107-23-240-208.compute-1.amazonaws.com/api/";
@@ -15,11 +24,26 @@
         const [fields, setFields] = useState([]);
         const [date, setDate] = useState(new Date())
         const [isQRReader, setIsQRReader] = useState(false)
+        const [isMap, setIsMap] = useState(false)
+        const [curentPosition, setCurentPosition] = useState(initialState);
 
         useEffect(() =>  {
             getAPI("catalog.php",(result) =>  {
                 setCatalogs(result);
             });
+
+            navigator.geolocation.getCurrentPosition(position => {
+                const { longitude, latitude } = position.coords;
+                setCurentPosition({
+                    ...curentPosition,
+                    latitude,
+                    longitude
+                })
+              },
+                error => alert(error.message),
+                { timeout: 20000, maximumAge: 1000 }
+                
+            )
         },[]);
 
         const getAPI = (URL, onSuccess) =>  {
@@ -61,8 +85,16 @@
             }
         }
 
-        if(isQRReader) return <QRreader/>
-        return (
+        if(isMap) return(
+            <MapView
+                provider={PROVIDER_GOOGLE}
+                style={{ flex: 1 }}
+                showsUserLocation
+                initialRegion={curentPosition}
+            />
+        );
+        else if(isQRReader) return <QRreader/>
+        else return (
             <NativeRouter>
             <View style={styles.container}>
                 <DropDownPicker
@@ -103,7 +135,7 @@
                 <View style={{borderWidth:1, width:"90%", height:50, flexDirection: "row", flexWrap: "wrap", borderRadius:5 , marginTop:5 }}>
                     <View 
                         style={{flex: 1, alignItems: "center", justifyContent: "center", width:"100%", height:"100%", backgroundColor:"green"  }}
-                        onStartShouldSetResponder={() => alert("Coming soon...") }
+                        onStartShouldSetResponder={() => setIsMap(true) }
                     >
                         <Text style={{color:"white"}}>GPS</Text>
                     </View>
